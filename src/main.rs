@@ -20,14 +20,17 @@ impl Note {
 fn get_index() -> String {
     //access database
     //get list notes
-    //serialize to json body
-    //send
+    //send list
     "Hello, World!".to_string()
 }
 
 //TODO: Change this to getting note by id
 #[get("/greeting/<id>")]
 fn get_name(id: i32) -> Json<Note> {
+    //access database
+    //get note attached to id
+    //if note exists, send back
+    //else send error dto
     todo!()
 }
 
