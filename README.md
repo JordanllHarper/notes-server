@@ -27,6 +27,7 @@ Handlers
 - [ ] Posting a new note
 - [ ] Editing a note
 - [ ] Removing a note
+      
 Database
 - [ ] Decide on db to use initially
 - [ ] Setup
