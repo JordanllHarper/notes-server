@@ -22,9 +22,14 @@ Submit an issue and pull requests if you have suggestions for improvements to th
 
 # TODO list
 
+Handlers
 - [x] Getting notes
 - [ ] Posting a new note
 - [ ] Editing a note
 - [ ] Removing a note
+Database
+- [ ] Decide on db to use initially
+- [ ] Setup
+- [ ] Implement handlers with db
 
 And to infinity and beyond?
