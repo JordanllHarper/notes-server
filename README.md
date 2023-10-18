@@ -10,7 +10,9 @@ A simple and secure web server for backing up markdown notes.
 
 ## Security - first draft and thoughts
 -> On first setup, user will be prompted to create a username and password for configuration.
+
 -> This will then gen an API key. 
+
 -> Only way to view and change API key is to have credentials and access to local server (via terminal access).
 
 # Suggestions and Improvements
