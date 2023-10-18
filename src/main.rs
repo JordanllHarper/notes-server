@@ -1,32 +1,12 @@
 #[macro_use]
 extern crate rocket;
 use rocket::serde::json::Json;
-
-#[derive(rocket::serde::Deserialize, rocket::serde::Serialize)]
-#[serde(crate = "rocket::serde")]
-struct Note {
-    id: i32,
-    contents: String,
-}
-
-impl Note {
-    fn new(id: i32, contents: String) -> Note {
-        Note { id, contents }
-    }
-}
-
-//TODO: Change this to getting list of note names
-#[get("/")]
-fn get_index() -> String {
-    //access database
-    //get list notes
-    //send list
-    "Hello, World!".to_string()
-}
+mod endpoints;
+mod models;
 
 //TODO: Change this to getting note by id
 #[get("/greeting/<id>")]
-fn get_name(id: i32) -> Json<Note> {
+fn get_name(id: i32) -> Json<models::note::Note> {
     //access database
     //get note attached to id
     //if note exists, send back
@@ -34,14 +14,11 @@ fn get_name(id: i32) -> Json<Note> {
     todo!()
 }
 
-#[post("/notes", format = "application/json", data = "<note>")]
-fn post_index(note: Json<Note>) -> String {
-    String::from("Sucessful post")
-}
-
 #[launch]
 fn rocket() -> _ {
-    rocket::build()
-        .mount("/", routes![get_index, post_index])
-        .mount("/greeting", routes![get_name])
+    let notes_endpoint = "/notes";
+
+    let notes_routes = endpoints::notes::handlers::provide_routes_notes();
+
+    rocket::build().mount(notes_endpoint, notes_routes)
 }
