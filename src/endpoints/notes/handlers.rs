@@ -1,18 +1,15 @@
-use rocket::Route;
+use rocket::{response::status::NotFound, serde::json::Json, Route};
+
+use super::dto::GetNotesResponseDto;
 
 pub fn provide_routes_notes() -> Vec<Route> {
     routes![get_index, post_index]
 }
 
-//TODO: Change this to getting list of note names
+//TODO: Change this to actual server response in working build
 #[get("/notes")]
-pub fn get_index() -> String {
-    //
-    //access database
-    //
-    //get list notes
-    //send list
-    "Hello, World!".to_string()
+pub fn get_index() -> Result<Json<GetNotesResponseDto>, NotFound<String>> {
+    Ok(Json(GetNotesResponseDto::dummy()))
 }
 
 #[post("/notes", format = "application/json", data = "<note>")]
