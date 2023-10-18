@@ -9,11 +9,11 @@ A simple and secure web server for backing up markdown notes.
 **Database Server**: TBD - consideration is leaning towards postgresql.
 
 ## Security - first draft and thoughts
--> On first setup, user will be prompted to create a username and password for configuration.
+On first setup, user will be prompted to create a username and password for configuration.
 
--> This will then gen an API key. 
+This will then gen an API key. 
 
--> Only way to view and change API key is to have credentials and access to local server (via terminal access).
+Only way to view and change API key is to have credentials and access to local server (via terminal access).
 
 # Suggestions and Improvements
 If anyone happens to stumble across this repository, welcome! 
