@@ -1,18 +1,38 @@
 #[macro_use]
 extern crate rocket;
+use rocket::serde::json::Json;
 
+#[derive(rocket::serde::Deserialize, rocket::serde::Serialize)]
+#[serde(crate = "rocket::serde")]
+struct Note {
+    id: i32,
+    contents: String,
+}
+
+impl Note {
+    fn new(id: i32, contents: String) -> Note {
+        Note { id, contents }
+    }
+}
+
+//TODO: Change this to getting list of note names
 #[get("/")]
 fn get_index() -> String {
+    //access database
+    //get list notes
+    //serialize to json body
+    //send
     "Hello, World!".to_string()
 }
 
-#[get("/greeting/<name>")]
-fn get_name(name: &str) -> String {
-    format!("Hello, {}", name)
+//TODO: Change this to getting note by id
+#[get("/greeting/<id>")]
+fn get_name(id: i32) -> Json<Note> {
+    todo!()
 }
 
-#[post("/")]
-fn post_index() -> String {
+#[post("/notes", format = "application/json", data = "<note>")]
+fn post_index(note: Json<Note>) -> String {
     String::from("Sucessful post")
 }
 
