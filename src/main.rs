@@ -13,7 +13,9 @@ pub fn main() -> Result<(), Box<dyn Error>> {
         .greeting("Welcome to my ftp server.")
         .passive_ports(50000..65535);
 
-    let ip = "127.0.0.1:2121";
+    let ip = "127.0.0.1";
+    let port = "2121";
+    let ip_to_host = format!("{}:{}", ip, port);
     // Listen...
 
     let runtime = tokio::runtime::Builder::new_current_thread()
@@ -22,7 +24,16 @@ pub fn main() -> Result<(), Box<dyn Error>> {
         .build()
         .unwrap();
 
-    println!("Server listening on ftp://{}", ip);
-    runtime.block_on(server.listen(ip))?;
+    println!();
+    println!("|||||||     Server running -_-     |||||||");
+    println!();
+    println!("Full address: {}", &ip_to_host);
+    println!("----");
+    println!("IP Address: {}", ip);
+    println!("----");
+    println!("Port: {}", port);
+    println!();
+
+    runtime.block_on(server.listen(ip_to_host))?;
     Ok(())
 }
