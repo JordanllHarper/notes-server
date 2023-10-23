@@ -33,6 +33,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
     println!("----");
     println!("Port: {}", port);
     println!();
+    println!("Press CTRL + C to stop the server");
 
     runtime.block_on(server.listen(ip_to_host))?;
     Ok(())
