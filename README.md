@@ -18,6 +18,3 @@ Submit an issue and pull requests if you have suggestions for improvements to th
 - [ ] Getting command line args for specific backups
 - [ ] Creating a default path to back up from by doing notesync (or something)
 
-
-
-
