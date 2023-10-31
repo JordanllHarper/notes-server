@@ -1,56 +1,64 @@
-use std::{fmt::Display, fs};
+use std::{arch, fs};
 
-use anyhow::Result;
-use ftp::{FtpError, FtpStream};
+use clap::{Parser, Subcommand};
+use ftp::FtpStream;
+use md_interactor::{list_current_dir, make_md_notes};
 use serde::Deserialize;
 
+mod md_interactor;
 #[derive(Debug, Deserialize)]
 struct Credentials {
     username: String,
     password: String,
 }
 
-fn get_credentials() -> anyhow::Result<Credentials> {
-    let file_contents = fs::read_to_string("credentials.json")
-        .expect("Put credentials in a provided credentials.json file.");
-    let creds: Credentials = serde_json::from_str(&file_contents.to_string())?;
-    Ok(creds)
+#[derive(Debug, Deserialize)]
+struct Configuration {
+    ip_addr: String,
+    filename: String,
+}
+fn read_from_json<T>(file_name: &str, error_message: &str) -> anyhow::Result<T>
+where
+    T: for<'a> Deserialize<'a>,
+{
+    let file_contents = fs::read_to_string(file_name).expect(error_message);
+    let obj: T = serde_json::from_str(&file_contents.to_string())?;
+    Ok(obj)
 }
 
-fn get_current_dir(ftp_stream: &mut FtpStream) -> anyhow::Result<String, FtpError> {
-    match ftp_stream.pwd() {
-        Ok(v) => Result::Ok(v),
-        Err(e) => Err(e),
-    }
-}
-fn list_current_dir(ftp_stream: &mut FtpStream) -> anyhow::Result<Vec<String>, FtpError> {
-    match ftp_stream.list(None) {
-        Ok(v) => Result::Ok(v),
-        Err(e) => Err(e),
-    }
-}
-fn cd_md_dir(ftp_stream: &mut FtpStream, md_path_in_ftp: &str) -> anyhow::Result<(), FtpError> {
-    match ftp_stream.cwd(md_path_in_ftp) {
-        Ok(v) => Result::Ok(v),
-        Err(e) => Err(e),
-    }
+#[derive(Parser)]
+struct Cli {
+    #[command(subcommand)]
+    specifier: Specifiers,
 }
 
-fn make_md_notes(ftp_stream: &mut FtpStream, filename: &str) -> anyhow::Result<(), FtpError> {
-    match ftp_stream.mkdir(&format!("{}{}", "./", filename)) {
-        Ok(v) => Result::Ok(v),
-        Err(e) => Err(e),
-    }
-}
-
-fn store_markdown_docs() {
-    todo!()
+#[derive(Subcommand)]
+enum Specifiers {
+    /// Pull files from the server. Use with * to overwrite all or specify a name.
+    Pull {
+        /// The file to pull from the server. E.g. * to pull all, or my_file.md to pull a specific
+        /// file.
+        #[arg(long)]
+        specifier: Option<String>,
+    }, //notes_ pull OR notes_ pull * (pull all) OR notes_ pull [filename]
+    /// Pull files from the server. Use with * to overwrite all or specify a name to overwrite.
+    Push {
+        /// The file (or files) to push to the server. E.g. * or my_file.md
+        #[arg(long)]
+        specifier: Option<String>,
+    }, //notes_ push OR notes_ push * (push all and overwrite file) OR notes_ push [filename] (overwrite a specific filename)
 }
 
 fn main() -> anyhow::Result<()> {
-    let ftp_server_ip = "127.0.0.1:2121";
-    let creds = get_credentials()?;
-    let mut ftp_stream = FtpStream::connect(ftp_server_ip).expect(&format!(
+    let creds = read_from_json::<Credentials>(
+        "credentials.json",
+        "Make sure to create a valid credentials.json file.\nAttributes should be:\n\nusername: [a valid username]\npassword: [a valid password]",
+    )?;
+    let configuration = read_from_json::<Configuration>("configuration.json", "Looks like you haven't got a configuration.json file. Create one in your path:\nAttributes should be: \n\n ip_addr: [your local ip]\nfilename: [your notes filename]")?;
+
+    let args = Cli::parse();
+    let ftp_server_ip = configuration.ip_addr;
+    let mut ftp_stream = FtpStream::connect(&ftp_server_ip).expect(&format!(
         "Check your server IP is running on {}",
         ftp_server_ip
     ));
@@ -59,12 +67,8 @@ fn main() -> anyhow::Result<()> {
         .login(&creds.username, &creds.password)
         .expect("Make sure login credentials are correct.");
 
-    //TODO: Check for notes dir - if exists then cd into --- else mkdir notes then cd into
-
-    let filename = "notes";
-    list_current_dir(&mut ftp_stream)?
-        .iter()
-        .for_each(|dir| println!("{}", dir));
+    let filename = configuration.filename;
+    // let _ = make_md_notes(&mut ftp_stream, &filename)?;
 
     Ok(())
 }
