@@ -1,4 +1,4 @@
-use anyhow::Ok;
+use ftp::FtpStream;
 
 pub enum FilePullStrategy {
     All,
@@ -18,17 +18,26 @@ fn match_some_value(value: &str) -> FilePullStrategy {
     match value {
         "*" => FilePullStrategy::All,
         "." => FilePullStrategy::All,
+        " " => FilePullStrategy::All,
         _ => FilePullStrategy::SpecificFile {
             filename: value.to_string(),
         },
     }
 }
-
-struct MarkdownFile {
-    file_name: String,
-    contents: Vec<u8>,
+pub struct MarkdownFile {
+    pub file_name: String,
+    pub contents: Vec<u8>,
 }
 
-pub fn pull_all_files() -> anyhow::Result<Vec<MarkdownFile>> {
-    Ok()
+pub fn pull_all_files(
+    ftp_stream: &mut FtpStream,
+    file_name: &str,
+) -> anyhow::Result<Vec<MarkdownFile>> {
+    todo!()
+}
+pub fn pull_specific_file(
+    ftp_stream: &mut FtpStream,
+    filename: &str,
+) -> anyhow::Result<MarkdownFile> {
+    todo!()
 }

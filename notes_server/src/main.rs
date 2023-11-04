@@ -17,7 +17,6 @@ pub fn main() -> Result<(), Box<dyn Error>> {
     let port = "2121";
     let ip_to_host = format!("{}:{}", ip, port);
     // Listen...
-
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_io()
         .enable_time()

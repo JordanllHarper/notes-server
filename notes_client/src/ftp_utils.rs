@@ -29,13 +29,13 @@ pub fn make_md_notes(ftp_stream: &mut FtpStream, filename: &str) -> anyhow::Resu
     }
 }
 
-pub fn push_file(
+pub fn write_contents_to_ftp(
     ftp_stream: &mut FtpStream,
     file_name_as_stored: &str,
     contents: &str,
 ) -> anyhow::Result<()> {
     let mut reader = Cursor::new(contents.as_bytes());
-    let result = ftp_stream.put(file_name_as_stored, &mut reader)?;
+    let _result = ftp_stream.put(file_name_as_stored, &mut reader)?;
     Ok(())
 }
 

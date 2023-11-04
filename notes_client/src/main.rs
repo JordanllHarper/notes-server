@@ -1,8 +1,9 @@
 use std::fs;
 
+use anyhow::Ok;
 use clap::{Parser, Subcommand};
 use ftp::FtpStream;
-use handlers::{pull_docs, push_docs};
+use handlers::{pull_docs, push_docs, FileCollection};
 use serde::Deserialize;
 
 mod ftp_utils;
@@ -56,20 +57,34 @@ enum Specifiers {
         /// The file to pull from the server. E.g. * to pull all, or my_file.md to pull a specific
         /// file.
         #[arg(short, long)]
-        specifier: Option<String>,
+        option: Option<String>,
     }, //notes_ pull OR notes_ pull * (pull all) OR notes_ pull [filename]
     /// Pull files from the server. Use with * to overwrite all or specify a name to overwrite.
     Push {
         /// The file (or files) to push to the server. E.g. * or my_file.md
         #[arg(short, long)]
-        specifier: Option<String>,
+        option: Option<String>,
     }, //notes_ push OR notes_ push * (push all and overwrite file) OR notes_ push [filename] (overwrite a specific filename)
 }
 
-fn handle_specifier(specifier: Specifiers, root_filename: String) -> anyhow::Result<()> {
+pub enum FTPOperationResult {
+    Pull(anyhow::Result<FileCollection>),
+    Push(anyhow::Result<()>),
+}
+fn handle_specifier(
+    ftp_stream: &mut FtpStream,
+    specifier: Specifiers,
+    root_filename: String,
+) -> anyhow::Result<FTPOperationResult> {
     match specifier {
-        Specifiers::Pull { specifier } => pull_docs(specifier, root_filename),
-        Specifiers::Push { specifier } => push_docs(specifier, root_filename),
+        Specifiers::Pull { option } => {
+            let pull_result = pull_docs(ftp_stream, option, root_filename);
+            Ok(FTPOperationResult::Pull(pull_result))
+        }
+        Specifiers::Push { option } => {
+            let push_result = push_docs(option, root_filename);
+            Ok(FTPOperationResult::Push(push_result))
+        }
     }
 }
 
@@ -90,8 +105,7 @@ fn main() -> anyhow::Result<()> {
         .expect("Make sure login credentials are correct.");
 
     let root_filename = configuration.filename;
-
-    handle_specifier(args.specifier, root_filename.to_string())?;
+    handle_specifier(&mut ftp_stream, args.specifier, root_filename.to_string())?;
 
     Ok(())
 }
